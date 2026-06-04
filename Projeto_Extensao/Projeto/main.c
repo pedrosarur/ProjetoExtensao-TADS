@@ -3,6 +3,7 @@
 #include <string.h>
 #include <locale.h>
 #include <ctype.h>
+#include <time.h>
 
 #define  NUM_MAX_CAD 1024
 #define NUM_MAX_NOME 101
@@ -17,10 +18,11 @@ typedef struct{
     char pelagem[101];
     char lar_temporario[101];
     int castrado;
-    char data_castracao[11];
     int vacina;
     char vacina_pendente[256];
     int status;
+    char data_cadastro[11];
+    char data_adocao[11];
 }Gato; //Struct sobre cadastro do gato
 
 Gato gatos[NUM_MAX_CAD];
@@ -80,13 +82,40 @@ int tela_menu_opcoes()
     return opcao;
 }
 
+int tela_menu_opcoes2()
+{
+    int opcao;
+    system("cls");
+    printf("--- CONSULTA DE GATOS ---");
+    printf("\n 1 - Ver Todos os Gatos");
+    printf("\n 2 - Ver Apenas Disponiveis");
+    printf("\n 3 - Ver Apenas Adotados");
+    printf("\n 0 - Voltar ao Menu Principal");
+
+    //faz a leitura da opção escolhida
+    printf("\n\n Escolha uma opção: ");
+    int erro = scanf("%d", &opcao);
+
+    //verifica se houve uma falha na leitura do scanf
+    if(erro != 1) {
+        //limpa o buffer do tecaldo (windows)
+        fflush(stdin);
+        //como teve uma falha na leitura, marca uma opção inválida
+        opcao = -1;
+    }
+
+    //retorna a opção escolhida
+    return opcao;
+}
+
 int main()
 {
     //coloca o idioma como português brasil
     setlocale(LC_ALL, "Portuguese");
     system("chcp 1252 > null");
 
-    int opcao;
+    int opcao, opcao2;
+    int achou = 0;
 
      do {
         // 1. Mostra o menu e captura a opção escolhida pelo usuário
@@ -116,8 +145,113 @@ int main()
                 break;
 
             case 3:
-                printf("\n[Em desenvolvimento] Consulta de Registros...\n");
-                system("pause");
+                opcao2 = tela_menu_opcoes2();
+
+                switch(opcao2) {
+                    case 1:
+                        printf("--- RESULTADO DA BUSCA (TODOS) ---\n");
+
+                        for(int i = 0; i < qtd_gatos; i++) {
+
+                            printf("\n[ID: %d]",
+                            gatos[i].microchip);
+
+                            printf(" NOME: %s",
+                            gatos[i].nome_gato);
+
+                            printf(" | SEXO: %c",
+                            gatos[i].sexo_gato);
+
+                            printf(" | PELAGEM: %s",
+                            gatos[i].pelagem);
+
+                            printf(" | ENTRADA: %s",
+                            gatos[i].data_cadastro);
+
+                            // Verifica o status e imprime a situação
+                            if(gatos[i].status == 1) {
+                                printf(" | STATUS: Disponivel");
+                            } else {
+                                printf(" | STATUS: Adotado");
+                            }
+
+                            printf("\n-----------------------------------------------");
+                        }
+
+                    printf("\nPressione ENTER para voltar ao menu...");
+                    getchar(); // Captura o ENTER pendente se houver
+                    getchar(); // Aguarda o usuário pressionar ENTER
+                    break;
+
+                    case 2:
+                        printf("--- RESULTADO DA BUSCA (DISPONIVEL) ---\n");
+
+                        for(int i = 0; i < qtd_gatos; i++) {
+
+                            // status == 1 significa disponível
+                            if(gatos[i].status == 1) {
+                                achou = 1;
+
+                                printf("\n[ID: %d]",
+                                gatos[i].microchip);
+
+                                printf(" NOME: %s",
+                                gatos[i].nome_gato);
+
+                                printf(" | SEXO: %c",
+                                gatos[i].sexo_gato);
+
+                                printf(" | PELAGEM: %s",
+                                gatos[i].pelagem);
+
+                                printf(" | ENTRADA: %s",
+                                gatos[i].data_cadastro);
+
+                                printf(" | STATUS: Disponivel");
+
+                                printf("\n----------------------------------------------");
+                            }
+                        }
+
+                        if(achou == 0) {
+                        printf("\nNenhum registro encontrado.");
+                        }
+
+                        printf("\nPressione ENTER para voltar ao menu...");
+                        getchar(); // Captura o ENTER pendente se houver
+                        getchar(); // Aguarda o usuário pressionar ENTER
+                        break;
+
+                    case 3:
+
+                        printf("--- RESULTADO DA BUSCA (ADOTADO) ---\n");
+
+
+                        for(int i = 0; i < qtd_gatos; i++) {
+
+                            // status == 1 significa disponível
+                            if(gatos[i].status == 0) {
+                                achou = 1;
+
+                                printf("\n[Microchip: %d] NOME: %s | SEXO: %c | PELAGEM: %s",
+                                gatos[i].microchip, gatos[i].nome_gato,
+                                gatos[i].sexo_gato, gatos[i].pelagem);
+                                printf(" | STATUS: Adotado");
+                                printf(" | ADOTADO EM: %s", gatos[i].data_adocao);
+                                printf("\n---------------------------------------------");
+                            }
+                        }
+
+                        if(achou == 0) {
+                        printf("\nNenhum registro encontrado.");
+                        }
+
+                    printf("\nPressione ENTER para voltar ao menu...");
+                    getchar(); // Captura o ENTER pendente se houver
+                    getchar(); // Aguarda o usuário pressionar ENTER
+                    break;
+
+                    }
                 break;
 
             case 0:
@@ -187,13 +321,13 @@ void leia_sexo(char *sexo){ //função universal para ler o sexo
     }while(erro == 1);
 }
 
-void leia_booleano(int *boolean){ //função universal para verificar 1 ou 0, ou seja, verdadeiro ou falso
+void leia_booleano(int *boolean, char mensagem[]){ //função universal para verificar 1 ou 0, ou seja, verdadeiro ou falso
     int erro;
 
     do{
         erro = 0; //sem erros
 
-        printf("\n O gato é castrado?\n 1 - Sim\n 0 - Não\n Escolha: ");
+        printf("\n %s \n 1 - Sim\n 0 - Não\n Escolha: ", mensagem);
         scanf("%d", boolean);
 
 
@@ -333,6 +467,10 @@ void leia_adocao() {
         if(gatos[i].microchip == microchip_escolhido &&
             gatos[i].status == 1) {
 
+            time_t agora = time(NULL);
+            struct tm *data = localtime(&agora);
+            strftime(gatos[i].data_adocao, 11, "%d/%m/%Y", data);
+
             // marca como adotado
             gatos[i].status = 0;
 
@@ -351,23 +489,28 @@ if(encontrado == 0) {
 
 
 void cadastrar_gato() {
-    // 1. Criamos uma variável do tipo da sua Struct Gato para agrupar os dados
+    // Criamos uma variável do tipo da sua Struct Gato para agrupar os dados
     Gato novo_gato;
 
     // Inicializa campos de controle da struct
     novo_gato.ocupado = 1;
     novo_gato.status = 1; // Ativo no sistema
 
+    time_t agora = time(NULL);
+    struct tm *data = localtime(&agora);
+    strftime(novo_gato.data_cadastro, 11, "%d/%m/%Y", data);
+
+
     printf("\nDigite o numero do Microchip (Apenas numeros): ");
     scanf("%d", &novo_gato.microchip);
 
-    // 2. Limpa o buffer do teclado de forma segura
+    // Limpa o buffer do teclado de forma segura
     fflush(stdin);
 
-    // 3. USO DA SUA FUNÇÃO UNIVERSAL DE STRING (Nome)
+    // USO DA SUA FUNÇÃO UNIVERSAL DE STRING (Nome)
     leia_string(novo_gato.nome_gato, "\nDigite o nome: ");
 
-    // 4. USO DA SUA FUNÇÃO UNIVERSAL DE SEXO
+    // USO DA SUA FUNÇÃO UNIVERSAL DE SEXO
     // Como sexo_gato é um char simples na struct, passamos com '&'
     leia_sexo(&novo_gato.sexo_gato);
 
@@ -377,27 +520,19 @@ void cadastrar_gato() {
         printf("Sexo cadastrado com sucesso: Masculino\n");
     }
 
-    // 5. REAPROVEITANDO A FUNÇÃO DE STRING PARA PELAGEM E LAR TEMPORÁRIO
+    // REAPROVEITANDO A FUNÇÃO DE STRING PARA PELAGEM E LAR TEMPORÁRIO
     leia_string(novo_gato.pelagem, "\nDigite a pelagem: ");
 
     leia_string(novo_gato.lar_temporario, "\nDigite o lar temporario: ");
 
-    // 6. USO DA SUA FUNÇÃO UNIVERSAL BOOLEANA (Castrado)
+    // USO DA SUA FUNÇÃO UNIVERSAL BOOLEANA (Castrado)
     // Adaptado para usar a sua função leia_booleano (0 ou 1) que está no código
-    leia_booleano(&novo_gato.castrado);
+    leia_booleano(&novo_gato.castrado, "O gato ja foi castrado?");
 
-    if(novo_gato.castrado == 1) {
-        printf("\n Digite a data da castracao (DD/MM/AAAA): ");
-        scanf(" %10[^\n]", novo_gato.data_castracao);
-        fflush(stdin);
-    } else {
-        strcpy(novo_gato.data_castracao, "N/A");
-    }
 
-    // 7. USO DA SUA FUNÇÃO UNIVERSAL BOOLEANA + PENDÊNCIAS (Vacina)
+    // USO DA SUA FUNÇÃO UNIVERSAL BOOLEANA + PENDÊNCIAS (Vacina)
     // Usamos a pergunta invertida para fazer sentido com o seu leia_booleano (1 para Sim/Em dia, 0 para Não)
-    printf("\n O gato possui TODAS as vacinas em dia?");
-    leia_booleano(&novo_gato.vacina);
+    leia_booleano(&novo_gato.vacina, "O gato possui TODAS as vacinas em dia?");
 
     if(novo_gato.vacina == 0) {
         // Se não está em dia, chama a sua função de pendências
@@ -413,6 +548,8 @@ void cadastrar_gato() {
 
     // aumenta quantidade cadastrada
     qtd_gatos++;
+
+    printf("\nData de cadastro: %s\n", novo_gato.data_cadastro);
 
     printf("\n=========================================");
     printf("\n*** SUCESSO: Felino '%s' gravado no banco de dados! ***\n", novo_gato.nome_gato);
