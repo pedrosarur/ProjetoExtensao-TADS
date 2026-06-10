@@ -1,0 +1,23 @@
+# depslib dependency file v1.0
+1781112524 source:c:\users\pedro\downloads\projeto_extensao\projeto\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<locale.h>
+	<ctype.h>
+	<time.h>
+
+1779318283 source:c:\users\aluno\downloads\projetoextensao-tads\projeto_extensao\projeto\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<locale.h>
+	<ctype.h>
+
+1780080336 source:c:\users\maria eduarda\downloads\projetoextensao-tads-main\projetoextensao-tads-main\projeto_extensao\projeto\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<locale.h>
+	<ctype.h>
+
