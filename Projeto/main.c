@@ -23,6 +23,7 @@ typedef struct{
     int status;
     char data_cadastro[11];
     char data_adocao[11];
+    int id_adotante; //util para facilitar o banco
 }Gato; //Struct sobre cadastro do gato
 
 typedef struct{
@@ -33,6 +34,7 @@ typedef struct{
     int idade;
     char email[101];
     char telefone[15];
+    int id_adotado; //util para facilitar o banco
 }Tutor; //Struct sobre cadastro do adotante
 
 /*-------------------- VARIAVEIS UNIVERSAIS------------*/
@@ -57,11 +59,15 @@ void leia_cpf(); //função para ler e verificar o cpf
 void leia_email(); // função para ler e verificar email
 void leia_telefone(); // função para ler e verificar o telefone
 void pausar();
+int leia_adocao(); // função de adoção
 
 /*---------- FUNCOES DE CONSULTA ----------*/
 void mostrar_gatos_adotados();
 void mostrar_gatos_disponiveis();
 void mostrar_todos_gatos();
+
+/*----------- FUNCOES DE EXCLUSAO -------------*/
+void excluir_gato();
 
 /*------------------- TELAS -------------*/
 
@@ -214,6 +220,13 @@ int main()
 
             case 4:
                 opcao_registro = tela_alterar_registros();
+
+                switch(opcao_registro){
+                    case 1:
+                        excluir_gato();
+                        pausar();
+                }
+
                 break;
 
             case 0:
@@ -421,18 +434,18 @@ void leia_telefone(char *numero){ //função para ler e verificar o telefone
     }while(erro == 1);
 }
 
-void leia_adocao() {
-    int microchip_escolhido;
-    int encontrado = 0;
+int leia_adocao(Tutor *tutor) { //recebe como parâmetro o id do adotante para facilitar a manipulação de dados
+    int id_escolhido;
 
-    printf("\nDigite o MICROCHIP do gato que sera adotado por este tutor: ");
-    scanf("%d", &microchip_escolhido);
+    printf("\nDigite o ID do gato que sera adotado por este tutor: ");
+    fflush(stdin);
+    scanf("%d", &id_escolhido);
 
 
 
     for(int i = 0; i < NUM_MAX_CAD; i++) {
 
-        if(gatos[i].ocupado == 1 && gatos[i].microchip == microchip_escolhido && gatos[i].status == 1) {
+        if(gatos[i].ocupado == 1 && gatos[i].id_gato == id_escolhido && gatos[i].status == 1) {
 
             time_t agora = time(NULL);
             struct tm *data = localtime(&agora);
@@ -440,18 +453,15 @@ void leia_adocao() {
 
             // marca como adotado
             gatos[i].status = 0;
+            gatos[i].id_adotante = (*tutor).id_tutor; //salva o id do adotante na struct do gato
+            (*tutor).id_adotado = gatos[i].id_gato; // salva o id do gato na struct do tutor
 
-            encontrado = 1;
-
-            printf("\nGato '%s' adotado com sucesso!",
-                    gatos[i].nome_gato);
-        break;
+            printf("\nGato '%s' adotado com sucesso!", gatos[i].nome_gato);
+            return 1;
+        }
     }
-}
-
-if(encontrado == 0) {
-    printf("\nERRO: Gato nao encontrado ou ja adotado!");
-}
+        printf("\nERRO: Gato não encontrado ou já adotado!");
+        return 0;
 }
 
 
@@ -533,7 +543,7 @@ void cadastrar_gato() {
 
 }
 
-void cadastrar_tutor() {
+void cadastrar_tutor(){
     Tutor novo_tutor;
 
     // Inicializa campos de controle da struct
@@ -549,14 +559,31 @@ void cadastrar_tutor() {
 
     leia_telefone(novo_tutor.telefone);
 
-   printf("\n--- GATOS DISPONIVEIS PARA ADOCAO ---\n");
+    int existe = 0;
+
+    for(int i = 0; i < NUM_MAX_CAD; i++){ //verificação para ver se existem gatos disponiveis para adoção
+        if(gatos[i].ocupado == 1 && gatos[i].status == 1){
+            existe = 1;
+            break;
+        }
+    }
+
+    if(existe == 0){
+        printf("\nERRO: Não existem gatos disponíveis para adoção!");
+        return;
+    }
+
+   printf("\n--- GATOS DISPONÍVEIS PARA ADOÇÃO ---\n");
 
     for(int i = 0; i < NUM_MAX_CAD; i++) {
 
         // status == 1 significa disponível
         if(gatos[i].ocupado == 1 && gatos[i].status == 1) {
 
-            printf("\nMicrochip: %d",
+            printf("\nID: %d",
+                gatos[i].id_gato);
+
+            printf(" | Microchip: %d",
                 gatos[i].microchip);
 
             printf(" | Nome: %s",
@@ -581,19 +608,20 @@ void cadastrar_tutor() {
 
     //if para ver se o cadastro esta lotado ou nao
     if(posicao == -1){
-    printf("\nERRO: Limite maximo de cadastros atingido!");
+    printf("\nERRO: Limite máximo de cadastros atingido!");
     return;
     }
 
     novo_tutor.id_tutor = posicao + 1;
-    tutores[posicao] = novo_tutor;
-    qtd_tutores++;
 
-    leia_adocao();
-
-
-
-    printf("\n*** SUCESSO: Tutor %s cadastrado e Adocao concluida! ***", novo_tutor.nome_tutor);
+    if(leia_adocao(&novo_tutor) == 1){
+        tutores[posicao] = novo_tutor;
+        qtd_tutores++;
+        printf("\n*** SUCESSO: Tutor %s cadastrado e Adoçãoo concluída! ***", novo_tutor.nome_tutor);
+    }
+    else{
+        printf("\nErro! Cadastro não realizado!");
+    }
 }
 
 /*------------------- FUNCOES DE CONSULTA ---------------------*/
@@ -707,4 +735,86 @@ void mostrar_gatos_adotados(){
     if(achou == 0) {
         printf("\nNenhum registro encontrado.");
     }
+}
+
+
+/*------------------ FUNÇÕES DE EXCLUSÃO ----------------------*/
+
+void excluir_gato(){
+    int existe = 0, id_exclusao, escolha, encontrado = 0;
+
+    for(int i = 0; i < NUM_MAX_CAD; i++){ //verificação para ver se existem gatos disponiveis para adoção
+        if(gatos[i].ocupado == 1){
+            existe = 1;
+            break;
+        }
+    }
+
+    if(existe == 0){
+        printf("\nERRO: Não existem gatos disponíveis para exclusão!");
+        return;
+    }
+
+   printf("\n--- GATOS DISPONÍVEIS PARA EXCLUSÃO ---\n");
+
+    for(int i = 0; i < NUM_MAX_CAD; i++) {
+
+        // ocupado == 1 mostrar apenas os que existem
+        if(gatos[i].ocupado == 1) {
+
+            printf("\nID: %d",
+                gatos[i].id_gato);
+
+            printf(" | Microchip: %d",
+                gatos[i].microchip);
+
+            printf(" | Nome: %s",
+                gatos[i].nome_gato);
+
+            printf(" | Sexo: %c",
+                gatos[i].sexo_gato);
+
+            printf("\n------------------------------------");
+        }
+    }
+
+    printf("\nDigite o ID do gato que você deseja excluir: ");
+    fflush(stdin);
+    scanf("%d", &id_exclusao);
+
+    for(int i = 0; i < NUM_MAX_CAD; i++){ //exclusão real
+
+        if(gatos[i].ocupado == 1 && id_exclusao == gatos[i].id_gato){
+
+            encontrado = 1;
+            printf("\nVocê tem certeza que deseja excluir o gato %s dos registros?", gatos[i].nome_gato);
+            leia_booleano(&escolha, "");
+
+            if(escolha == 1){
+                gatos[i].ocupado = 0; //desocupa a posição do gato == excluir
+
+                if(gatos[i].status == 0){ //verifica se o gato tem algum registro de adoção e exclui se tiver
+
+                    int pos_tutor = gatos[i].id_adotante - 1;
+
+                    tutores[pos_tutor].id_adotado = 0;
+                    tutores[pos_tutor].ocupado = 0;
+                    printf("\nGato %s e tutor %s excluído com sucesso!", gatos[i].nome_gato, tutores[pos_tutor].nome_tutor);
+                }
+                else{
+                    printf("\nGato %s excluído com sucesso!", gatos[i].nome_gato);
+                }
+            }
+            else{
+                printf("\nO gato %s não foi excluido!", gatos[i].nome_gato);
+            }
+
+            break; //acaba com o laço
+        }
+    }
+
+    if(encontrado == 0){ //se não achar o id
+    printf("\nERRO: ID não encontrado!");
+    }
+
 }
