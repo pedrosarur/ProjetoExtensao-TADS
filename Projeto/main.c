@@ -67,6 +67,7 @@ void mostrar_todos_gatos();
 
 /*----------- FUNCOES DE EXCLUSAO -------------*/
 void excluir_gato();
+void excluir_tutor();
 
 /*------------------- TELAS -------------*/
 
@@ -220,6 +221,11 @@ int main()
                     case 1:
                         excluir_gato();
                         pausar();
+                        break;
+                    case 2:
+                        excluir_tutor();
+                        pausar();
+                        break;
                 }
 
                 break;
@@ -586,7 +592,7 @@ void cadastrar_tutor(){
 
     leia_cpf(novo_tutor.cpf); //após ler cpf, verificação para ver o a pessoa ja esta cadastrada no sistema ou não
 
-    int cadastro_existe = 0, posicao_cadastrado = -1;
+    int cadastro_existe = 0, posicao_cadastrado = -1    ;
 
     for(int i = 0; i < NUM_MAX_CAD; i++){
         if(tutores[i].ocupado == 1 && strcmp(novo_tutor.cpf, tutores[i].cpf) == 0){
@@ -760,7 +766,8 @@ void mostrar_gatos_adotados(){
 /*------------------ FUNÇÕES DE EXCLUSÃO ----------------------*/
 
 void excluir_gato(){
-    int existe = 0, id_exclusao, escolha, encontrado = 0;
+    int existe = 0, id_exclusao, escolha, encontrado = 0, pos_tutor =-1;
+    int cont = 0; // contador para saber se tem mais de 1 gato adotado pro mesmo tutor
 
     for(int i = 0; i < NUM_MAX_CAD; i++){ //verificação para ver se existem gatos disponiveis para adoção
         if(gatos[i].ocupado == 1){
@@ -810,21 +817,42 @@ void excluir_gato(){
             leia_booleano(&escolha, "");
 
             if(escolha == 1){
-                gatos[i].ocupado = 0; //desocupa a posição do gato == excluir
 
                 if(gatos[i].status == 0){ //verifica se o gato tem algum registro de adoção e exclui se tiver
 
-                    int pos_tutor = gatos[i].id_adotante - 1;
+                    for(int j = 0; j < NUM_MAX_CAD; j++){
 
-                    tutores[pos_tutor].ocupado = 0;
-                    printf("\nGato %s e tutor %s excluído com sucesso!", gatos[i].nome_gato, tutores[pos_tutor].nome_tutor);
+                        if(gatos[j].ocupado == 1 && gatos[j].id_adotante == gatos[i].id_adotante){
+                            cont++;
+                        }
+                        if(tutores[j].ocupado == 1 && tutores[j].id_tutor == gatos[i].id_adotante){
+                            pos_tutor = j;
+                        }
+                    }
+                    if(cont > 1){ //verificação pra se for maior que 1, não excluir o tutor
+
+                        gatos[i].ocupado = 0; //desocupa a posição do gato == excluir
+                        printf("\nGato %s excluído com sucesso!", gatos[i].nome_gato);
+                        pausar();
+                        break;
+                    }
+                    else{
+
+                        gatos[i].ocupado = 0; //desocupa a posição do gato == excluir
+                        tutores[pos_tutor].ocupado = 0;
+                        printf("\nGato %s e tutor %s excluído com sucesso!", gatos[i].nome_gato, tutores[pos_tutor].nome_tutor);
+                        pausar();
+                    }
                 }
                 else{
+                    gatos[i].ocupado = 0; //desocupa a posição do gato == excluir
                     printf("\nGato %s excluído com sucesso!", gatos[i].nome_gato);
+                    pausar();
                 }
             }
             else{
                 printf("\nO gato %s não foi excluido!", gatos[i].nome_gato);
+                pausar();
             }
 
             break; //acaba com o laço
@@ -835,4 +863,140 @@ void excluir_gato(){
     printf("\nERRO: ID não encontrado!");
     }
 
+}
+
+void excluir_tutor(){
+    int existe = 0, id_exclusao, escolha, encontrado = 0;
+
+    for(int i = 0; i < NUM_MAX_CAD; i++){ //verificação para ver se existem tutores disponiveis
+        if(tutores[i].ocupado == 1){
+            existe = 1;
+            break;
+        }
+    }
+
+    if(existe == 0){
+        printf("\nERRO: Não existem tutores disponíveis para exclusão!");
+        return;
+    }
+
+    printf("\n--- TUTORES DISPONÍVEIS PARA EXCLUSÃO ---\n");
+
+    for(int i = 0; i < NUM_MAX_CAD; i++) {
+
+        // ocupado == 1 mostrar apenas os que existem
+        if(tutores[i].ocupado == 1) {
+
+            printf("\nID: %d",
+                tutores[i].id_tutor);
+
+            printf(" | Nome: %s",
+                tutores[i].nome_tutor);
+
+            printf(" | CPF: %s",
+                tutores[i].cpf);
+
+            printf(" | Telefone: %s",
+                tutores[i].telefone);
+
+            printf("\n------------------------------------");
+        }
+    }
+
+    printf("\nDigite o ID do tutor que você deseja excluir: ");
+    fflush(stdin);
+    scanf("%d", &id_exclusao);
+
+    for(int i = 0; i < NUM_MAX_CAD; i++){ //exclusão real
+
+        if(tutores[i].ocupado == 1 && id_exclusao == tutores[i].id_tutor){
+
+            encontrado = 1; //achou pelo menos 1
+
+            printf("\nVocê tem certeza que deseja excluir o tutor %s dos registros?", tutores[i].nome_tutor);
+            leia_booleano(&escolha, "");
+
+            if(escolha == 1){
+
+                int cont = 0; // contador para saber se tem mais de 1 gato adotado pro mesmo tutor
+
+                for(int j = 0; j < NUM_MAX_CAD; j++){ //contador para saber se o tutor tem adoções vinculadas a ele
+                    if(gatos[j].ocupado == 1 && gatos[j].id_adotante == tutores[i].id_tutor){
+                        cont++;
+                    }
+                }
+
+                if(cont > 0){
+                    system("cls");
+                    printf("\nAVISO: %d gatos vinculados ao tutor %s", cont, tutores[i].nome_tutor);
+                    printf("\nNOMES: ");
+                    for(int j = 0; j < NUM_MAX_CAD; j++){
+                        if(gatos[j].ocupado == 1 && gatos[j].id_adotante == tutores[i].id_tutor){
+                            printf("%s, ", gatos[j].nome_gato);
+                        }
+                    }
+
+                    int exclusao; //opção de exclusao
+                    printf("\n1 - Excluir apenas o tutor e colocar os gatos disponíveis para adoção");
+                    printf("\n2 - Excluir o tutor e os gatos");
+                    printf("\n3 - Cancelar operação");
+                    printf("\nDigite a opção: ");
+                    scanf("%d", &exclusao);
+
+                    while(exclusao != 1 && exclusao != 2 && exclusao != 3){
+                        printf("\nValor não encontrado! Digite novamente: ");
+                        scanf("%d", &exclusao);
+                    }
+
+                    if(exclusao == 1){ //excluindo o tutor e deixando os gatos disponiveis
+                        for(int j = 0; j < NUM_MAX_CAD; j++){
+                            if(gatos[j].ocupado == 1 && gatos[j].id_adotante == tutores[i].id_tutor){
+                                gatos[j].id_adotante = 0;
+                                gatos[j].status = 1;
+                                strcpy(gatos[j].data_adocao, "");
+                            }
+                        }
+
+                        tutores[i].ocupado = 0;
+                        printf("\n\nTutor %s removido com sucesso! Gatos estão disponíveis novamente para adoção.", tutores[i].nome_tutor);
+                        pausar();
+                    }
+                    if(exclusao == 2){
+                        for(int j = 0; j < NUM_MAX_CAD; j++){
+                            if(gatos[j].ocupado == 1 && gatos[j].id_adotante == tutores[i].id_tutor){
+                                gatos[j].id_adotante = 0;
+                                gatos[j].ocupado = 0;
+                            }
+                        }
+
+                        tutores[i].ocupado = 0;
+                        printf("\nTutor %s removido com sucesso! Gatos relacionados ao tutor removidos com sucesso.", tutores[i].nome_tutor);
+                        pausar();
+                    }
+                    if(exclusao == 3){
+                        printf("\nO tutor %s não foi excluido!", tutores[i].nome_tutor);
+                        pausar();
+                        break;
+                    }
+                }
+                else{
+                    tutores[i].ocupado = 0;
+                    printf("\n\nTutor %s removido com sucesso!", tutores[i].nome_tutor);
+                    pausar();
+                }
+
+            }
+            else{
+                 printf("\nO tutor %s não foi excluido!", tutores[i].nome_tutor);
+                 pausar();
+            }
+
+            break; //acaba com o laço
+        }
+    }
+
+    if(encontrado == 0){ //se não achar o id
+        printf("\nERRO: ID não encontrado!");
+        pausar();
+    }
 }
