@@ -73,6 +73,7 @@ int leia_adocao(); // função de adoção
 void mostrar_gatos_adotados();
 void mostrar_gatos_disponiveis();
 void mostrar_todos_gatos();
+void mostrar_tutores();
 
 /*----------- FUNCOES DE EXCLUSAO -------------*/
 void excluir_gato();
@@ -124,6 +125,7 @@ int tela_consultas()
     printf("\n 1 - Ver Todos os Gatos");
     printf("\n 2 - Ver Apenas Disponiveis");
     printf("\n 3 - Ver Apenas Adotados");
+    printf("\n 4 - Ver Todos os Tutores");
     printf("\n 0 - Voltar ao Menu Principal");
 
     //faz a leitura da opção escolhida
@@ -151,8 +153,6 @@ int tela_alterar_registros() //tela feita para alteracao de dados
     printf(" --- ALTERAR REGISTROS ---\n");
     printf("\n 1 - Excluir Registros dos Gatos");
     printf("\n 2 - Excluir Registros dos Tutores");
-    printf("\n 3 - Editar Registros dos Tatos");
-    printf("\n 4 - Editar Registros dos Tutores");
     printf("\n 0 - Voltar ao Menu Principal");
 
     //faz a leitura da opção escolhida
@@ -211,6 +211,7 @@ int main()
 
                 switch(opcao_consulta){
                     case 1:
+                        system("cls");
                         printf(" --- RESULTADO DA BUSCA (TODOS) ---\n");
 
                         mostrar_todos_gatos();
@@ -218,6 +219,7 @@ int main()
                         break;
 
                     case 2:
+                        system("cls");
                         printf(" --- RESULTADO DA BUSCA (DISPONIVEL) ---\n");
 
                         mostrar_gatos_disponiveis();
@@ -225,11 +227,27 @@ int main()
                         break;
 
                     case 3:
+                        system("cls");
                         printf(" --- RESULTADO DA BUSCA (ADOTADO) ---\n");
 
                         mostrar_gatos_adotados();
                         pausar();
                         break;
+
+                    case 4:
+                        system("cls");
+                        printf(" --- RESULTADO DA BUSCA (TUTORES) ---\n");
+
+                        mostrar_tutores();
+                        pausar();
+                        break;
+
+                    case 0:
+                        break;
+
+                    default:
+                        printf("\n Opção não encontrada!");
+                        pausar();
                 }
 
                 break; // fim do case secundario e voltando pro switch case principal
@@ -246,6 +264,7 @@ int main()
 
                         pausar();
                         break;
+
                     case 2:
                         excluir_tutor(); //exclui e em seguida salva
 
@@ -254,6 +273,10 @@ int main()
 
                         pausar();
                         break;
+
+                    case 0:
+                        break;
+
                     default:
                         printf("\n Opção não encontrada!");
                         pausar();
@@ -773,22 +796,14 @@ void mostrar_gatos_adotados(){
             printf(" NOME: %s",
             gatos[i].nome_gato);
 
-            printf(" | SEXO: %c",
-            gatos[i].sexo_gato);
+            printf(" | IDADE: %d",
+            tutores[i].idade);
 
-            printf(" | PELAGEM: %s",
-            gatos[i].pelagem);
+            printf(" | EMAIL: %s",
+            tutores[i].email);
 
-            printf(" | ENTRADA: %s",
-            gatos[i].data_cadastro);
-
-            printf(" | STATUS: Adotado");
-            printf(" | ADOTADO EM: %s", gatos[i].data_adocao);
-            for(int j = 0; j < NUM_MAX_CAD; j++){
-                if(gatos[i].id_adotante == tutores[j].id_tutor && tutores[j].ocupado == 1){
-                    printf(" | ADOTADO POR: %s", tutores[j].nome_tutor);
-                }
-            }
+            printf(" | TELEFONE: %s",
+            tutores[i].telefone);
 
             printf("\n----------------------------------------------");
         }
@@ -799,6 +814,38 @@ void mostrar_gatos_adotados(){
     }
 }
 
+void mostrar_tutores(){
+
+    int achou = 0;
+
+    for(int i = 0; i < NUM_MAX_CAD; i++) {
+
+        if(tutores[i].ocupado == 1) {
+            achou = 1;
+
+            printf(" NOME: %s",
+            tutores[i].nome_tutor);
+
+            printf("\nCPF: %s",
+            tutores[i].cpf);
+
+            printf(" | SEXO: %c",
+            gatos[i].sexo_gato);
+
+            printf(" | PELAGEM: %s",
+            gatos[i].pelagem);
+
+            printf(" | ENTRADA: %s",
+            gatos[i].data_cadastro);
+
+            printf("\n----------------------------------------------");
+        }
+    }
+
+    if(achou == 0) {
+        printf("\n Nenhum registro encontrado.");
+    }
+}
 
 /*------------------ FUNÇÕES DE EXCLUSÃO ----------------------*/
 
