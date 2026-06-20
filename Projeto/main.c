@@ -83,8 +83,8 @@ int tela_menu_opcoes()
     printf("\n SISTEMA DE ADOÇÃO MIAUADOTA");
     printf("\n ===============================");
 
-    printf("\n 1 - Cadastar Novo Gato");
-    printf("\n 2 - Cadastar Tutor e Adotar Gato");
+    printf("\n 1 - Cadastrar Novo Gato");
+    printf("\n 2 - Cadastrar Tutor e Adotar Gato");
     printf("\n 3 - Consultar Registros");
     printf("\n 4 - Alterar ou Excluir Registros");
     printf("\n 0 - Sair do Programa");
@@ -226,6 +226,9 @@ int main()
                         excluir_tutor();
                         pausar();
                         break;
+                    default:
+                        printf("\nOpção não encontrada!");
+                        pausar();
                 }
 
                 break;
@@ -752,6 +755,11 @@ void mostrar_gatos_adotados(){
 
             printf(" | STATUS: Adotado");
             printf(" | ADOTADO EM: %s", gatos[i].data_adocao);
+            for(int j = 0; j < NUM_MAX_CAD; j++){
+                if(gatos[i].id_adotante == tutores[j].id_tutor && tutores[j].ocupado == 1){
+                    printf(" | ADOTADO POR: %s", tutores[j].nome_tutor);
+                }
+            }
 
             printf("\n----------------------------------------------");
         }
@@ -833,7 +841,6 @@ void excluir_gato(){
 
                         gatos[i].ocupado = 0; //desocupa a posição do gato == excluir
                         printf("\nGato %s excluído com sucesso!", gatos[i].nome_gato);
-                        pausar();
                         break;
                     }
                     else{
@@ -841,18 +848,15 @@ void excluir_gato(){
                         gatos[i].ocupado = 0; //desocupa a posição do gato == excluir
                         tutores[pos_tutor].ocupado = 0;
                         printf("\nGato %s e tutor %s excluído com sucesso!", gatos[i].nome_gato, tutores[pos_tutor].nome_tutor);
-                        pausar();
                     }
                 }
                 else{
                     gatos[i].ocupado = 0; //desocupa a posição do gato == excluir
                     printf("\nGato %s excluído com sucesso!", gatos[i].nome_gato);
-                    pausar();
                 }
             }
             else{
                 printf("\nO gato %s não foi excluido!", gatos[i].nome_gato);
-                pausar();
             }
 
             break; //acaba com o laço
