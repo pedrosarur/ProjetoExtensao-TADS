@@ -741,7 +741,10 @@ void mostrar_todos_gatos(){
         }
     }
 
-    if(achou == 0){
+    if(achou == 1){
+        printf("\n\n Total de gatos: %d", qtd_gatos);
+    }
+    else{
         printf("\n Nenhum registro encontrado.");
     }
 }
@@ -796,14 +799,22 @@ void mostrar_gatos_adotados(){
             printf(" NOME: %s",
             gatos[i].nome_gato);
 
-            printf(" | IDADE: %d",
-            tutores[i].idade);
+            printf(" | SEXO: %c",
+            gatos[i].sexo_gato);
 
-            printf(" | EMAIL: %s",
-            tutores[i].email);
+            printf(" | PELAGEM: %s",
+            gatos[i].pelagem);
 
-            printf(" | TELEFONE: %s",
-            tutores[i].telefone);
+            printf(" | ENTRADA: %s",
+            gatos[i].data_cadastro);
+
+            printf(" | SAIDA: %s", gatos[i].data_adocao);
+
+            for(int j = 0; j < NUM_MAX_CAD; j++){ //mostrando quem adotou
+                if(gatos[i].id_adotante == tutores[j].id_tutor){
+                    printf(" | TUTOR: %s", tutores[j].nome_tutor);
+                }
+            }
 
             printf("\n----------------------------------------------");
         }
@@ -823,26 +834,29 @@ void mostrar_tutores(){
         if(tutores[i].ocupado == 1) {
             achou = 1;
 
-            printf(" NOME: %s",
+            printf("\nNOME: %s",
             tutores[i].nome_tutor);
 
-            printf("\nCPF: %s",
+            printf(" | CPF: %s",
             tutores[i].cpf);
 
-            printf(" | SEXO: %c",
-            gatos[i].sexo_gato);
+            printf(" | IDADE: %d",
+            tutores[i].idade);
 
-            printf(" | PELAGEM: %s",
-            gatos[i].pelagem);
+            printf(" | EMAIL: %s",
+            tutores[i].email);
 
-            printf(" | ENTRADA: %s",
-            gatos[i].data_cadastro);
+            printf(" | TELEFONE: %s",
+            tutores[i].telefone);
 
             printf("\n----------------------------------------------");
         }
     }
 
-    if(achou == 0) {
+    if(achou == 1){
+        printf("\n\n Total de tutores: %d", qtd_tutores);
+    }
+    else{
         printf("\n Nenhum registro encontrado.");
     }
 }
