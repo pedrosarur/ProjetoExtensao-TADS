@@ -123,7 +123,7 @@ int tela_consultas()
 
     printf(" --- CONSULTA DE GATOS ---");
     printf("\n 1 - Ver Todos os Gatos");
-    printf("\n 2 - Ver Apenas Disponiveis");
+    printf("\n 2 - Ver Apenas Disponíveis");
     printf("\n 3 - Ver Apenas Adotados");
     printf("\n 4 - Ver Todos os Tutores");
     printf("\n 0 - Voltar ao Menu Principal");
@@ -337,7 +337,7 @@ void leia_sexo(char *sexo){ //função universal para ler o sexo
         erro = 0; //sem erros
         char strSexo[3];
 
-        printf("\n Esolha o sexo (F/M): ");
+        printf("\n Escolha o sexo (F/M): ");
         scanf(" %2[^\n]", strSexo);
 
         fflush(stdin); //limpa o buffer do teclado
@@ -381,7 +381,7 @@ void leia_pendencias(char *str){ //função para ler as pendencias de vacinação
     do{
         erro = 0; //sem erros
 
-        printf("\n Pendencias da vacina: ");
+        printf("\n Pendências da vacina: ");
         scanf(" %255[^\n]", str);
 
         fflush(stdin); //limpa o buffer do teclado
@@ -530,7 +530,7 @@ int leia_adocao(Tutor *tutor) { //recebe como parâmetro o id do adotante para fa
 
     int id_escolhido;
 
-    printf("\n Digite o ID do gato que sera adotado por este tutor: ");
+    printf("\n Digite o ID do gato que será adotado por este tutor: ");
     fflush(stdin);
     scanf("%d", &id_escolhido);
 
@@ -573,7 +573,7 @@ void cadastrar_gato() {
 
     printf(" --- CADASTRO DE GATO ---");
 
-    printf("\n Digite o numero do Microchip (Apenas numeros): ");
+    printf("\n Digite o número do Microchip (Apenas números): ");
     scanf("%d", &novo_gato.microchip);
 
     // Limpa o buffer do teclado de forma segura
@@ -594,10 +594,10 @@ void cadastrar_gato() {
     //FUNÇÃO DE STRING PARA PELAGEM E LAR TEMPORÁRIO
     leia_string(novo_gato.pelagem, "\n Digite a pelagem: ");
 
-    leia_string(novo_gato.lar_temporario, "\n Digite o lar temporario: ");
+    leia_string(novo_gato.lar_temporario, "\n Digite o lar temporário: ");
 
     //FUNÇÃO UNIVERSAL BOOLEANA (Castrado)
-    leia_booleano(&novo_gato.castrado, " O gato ja foi castrado?");
+    leia_booleano(&novo_gato.castrado, " O gato já foi castrado?");
 
     //FUNÇÃO BOOLEANA (Vacinas)
     leia_booleano(&novo_gato.vacina, " O gato possui TODAS as vacinas em dia?");
@@ -621,7 +621,7 @@ void cadastrar_gato() {
 
     //if para ver se o cadastro esta lotado ou nao
     if(posicao == -1){
-    printf("\n ERRO: Limite maximo de cadastros atingido!");
+    printf("\n ERRO: Limite máximo de cadastros atingido!");
     return;
     }
 
@@ -732,7 +732,7 @@ void mostrar_todos_gatos(){
 
             // Verifica o status e imprime a situação
             if(gatos[i].status == 1) {
-                printf(" | STATUS: Disponivel");
+                printf(" | STATUS: Disponível");
             }
             else{
                 printf(" | STATUS: Adotado");
@@ -773,7 +773,7 @@ void mostrar_gatos_disponiveis(){
             printf(" | ENTRADA: %s",
             gatos[i].data_cadastro);
 
-            printf(" | STATUS: Disponivel");
+            printf(" | STATUS: Disponível");
 
             printf("\n----------------------------------------------");
         }
