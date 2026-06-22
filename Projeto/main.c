@@ -59,15 +59,16 @@ void cadastrar_tutor();
 
 /*----------- FUNCOES PARA LEITURA -----------------*/
 
-void leia_string(); //verificação universal de string --- nome, pelagem, lar
-void leia_sexo();
-void leia_booleano(); // verifica universal de booleano - vacina, castrado
-void leia_pendencias(); //função para escrever as pendências e verificação
-void leia_cpf(); //função para ler e verificar o cpf
-void leia_email(); // função para ler e verificar email
-void leia_telefone(); // função para ler e verificar o telefone
+void leia_string(char *str, char mensagem[]); //verificação universal de string --- nome, pelagem, lar
+void leia_sexo(char *sexo);
+void leia_booleano(int *boolean, char mensagem[]); // verifica universal de booleano - vacina, castrado
+void leia_pendencias(char *str); //função para escrever as pendências e verificação
+void leia_cpf(char *str); //função para ler e verificar o cpf
+void leia_idade (int *idade); //função de verificação de idade
+void leia_email(char *email); // função para ler e verificar email
+void leia_telefone(char *numero); // função para ler e verificar o telefone
+int leia_adocao(Tutor *tutor); // função de adoção
 void pausar();
-int leia_adocao(); // função de adoção
 
 /*---------- FUNCOES DE CONSULTA ----------*/
 void mostrar_gatos_adotados();
@@ -207,7 +208,7 @@ int main()
                 break;
 
             case 3:
-                opcao_consulta = tela_consultas();
+                opcao_consulta = tela_consultas(); //consultas
 
                 switch(opcao_consulta){
                     case 1:
@@ -286,6 +287,7 @@ int main()
 
             case 0:
                 printf("\n Saindo do programa... Obrigado!\n");
+                system("pause");
                 break;
 
             default:
@@ -364,6 +366,7 @@ void leia_booleano(int *boolean, char mensagem[]){ //função universal para verif
         erro = 0; //sem erros
 
         printf("\n %s \n 1 - Sim\n 0 - Não\n Escolha: ", mensagem);
+        fflush(stdin);
         scanf("%d", boolean);
 
 
@@ -646,7 +649,7 @@ void cadastrar_tutor(){
 
     leia_cpf(novo_tutor.cpf); //após ler cpf, verificação para ver o a pessoa ja esta cadastrada no sistema ou não
 
-    int cadastro_existe = 0, posicao_cadastrado = -1    ;
+    int cadastro_existe = 0, posicao_cadastrado = -1;
 
     for(int i = 0; i < NUM_MAX_CAD; i++){
         if(tutores[i].ocupado == 1 && strcmp(novo_tutor.cpf, tutores[i].cpf) == 0){
@@ -694,9 +697,9 @@ void cadastrar_tutor(){
         novo_tutor.id_tutor = posicao + 1;
 
         if(leia_adocao(&novo_tutor) == 1){
-        tutores[posicao] = novo_tutor;
-        qtd_tutores++;
-        printf("\n *** SUCESSO: Tutor %s cadastrado e Adoção concluída! ***", novo_tutor.nome_tutor);
+            tutores[posicao] = novo_tutor;
+            qtd_tutores++;
+            printf("\n *** SUCESSO: Tutor %s cadastrado e Adoção concluída! ***", novo_tutor.nome_tutor);
         }
         else{
             printf(" \nErro! Cadastro não realizado!");
@@ -811,7 +814,7 @@ void mostrar_gatos_adotados(){
             printf(" | SAIDA: %s", gatos[i].data_adocao);
 
             for(int j = 0; j < NUM_MAX_CAD; j++){ //mostrando quem adotou
-                if(gatos[i].id_adotante == tutores[j].id_tutor){
+                if(tutores[j].ocupado == 1 && gatos[i].id_adotante == tutores[j].id_tutor){
                     printf(" | TUTOR: %s", tutores[j].nome_tutor);
                 }
             }
@@ -939,6 +942,7 @@ void excluir_gato(){
                         gatos[i].ocupado = 0; //desocupa a posição do gato == excluir
                         qtd_gatos--; //diminui 1 gato do contador universal
                         tutores[pos_tutor].ocupado = 0;
+                        qtd_tutores--;
                         printf("\n Gato %s e tutor %s excluído com sucesso!", gatos[i].nome_gato, tutores[pos_tutor].nome_tutor);
                     }
                 }
